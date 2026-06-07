@@ -1,0 +1,51 @@
+{
+  "_comment": "Slowly-changing data updated manually or monthly. Margin debt, private credit, etc.",
+  "margin_debt": {
+    "current_value": 1300,
+    "unit": "$B",
+    "as_of_date": "2026-04-30",
+    "all_time_high": 1300,
+    "all_time_high_date": "2026-04-30",
+    "current_vs_mean_pct": 72,
+    "growth_yoy_pct": 53,
+    "consecutive_monthly_increases": 8,
+    "margin_debt_to_gdp_pct": 4.6,
+    "margin_debt_to_gdp_50y_median": 2.1
+  },
+  "private_credit": {
+    "market_size_trillion": 1.7,
+    "growth_from_2020": "133% growth from $0.73T in 2020",
+    "projected_2029": "$2.6 trillion (Preqin estimate)",
+    "default_rate": 6.0,
+    "default_historical_avg": 3.2,
+    "default_normal_range": "2.0-4.0%",
+    "default_as_of": "2026-04-30",
+    "default_including_lmes": 8.5,
+    "default_software": 9.2,
+    "default_small_issuers": 10.5,
+    "default_automotive": 7.8,
+    "negative_fcf_pct": 42,
+    "prior_fcf_2021": 30,
+    "interest_coverage_ratio": 1.4,
+    "public_borrower_icr": 2.8,
+    "shadow_default_rate": 4.7,
+    "bank_ndfi_exposure_trillion": 0.45,
+    "evergreen_fund_aum": "$180B in semi-liquid structures"
+  },
+  "cape": {
+    "historical_mean": 17.1,
+    "historical_median": 15.9,
+    "dot_com_peak": 44.2,
+    "dot_com_peak_date": "December 1999",
+    "peak_1929": 32.6
+  },
+  "buffett": {
+    "historical_average": 90,
+    "normal_range": "75-120%"
+  },
+  "yield_curve": {
+    "historical_average": 0.93,
+    "last_inversion_date": "2024-09-15",
+    "normal_range": "0.5-2.0%"
+  }
+}

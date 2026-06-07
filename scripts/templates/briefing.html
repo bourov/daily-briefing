@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src 'self'; frame-ancestors 'none'">
+  <title>Daily Morning Briefing — {{ date_long }}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f5f5; color: #333; line-height: 1.6; }
+    .container { max-width: 750px; margin: 20px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden; }
+    .header { background: linear-gradient(135deg, #1a237e, #283593); color: #fff; padding: 30px; text-align: center; }
+    .header h1 { font-size: 1.8em; margin-bottom: 5px; }
+    .header .subtitle { font-size: 1.05em; opacity: 0.9; }
+    .section { padding: 20px 30px; border-bottom: 1px solid #eee; }
+    .section:last-of-type { border-bottom: none; }
+    .section h2 { font-size: 1.3em; margin-bottom: 12px; color: #1a237e; }
+    .section h3 { font-size: 1.1em; margin: 14px 0 8px; color: #283593; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+    th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #eee; }
+    th { background: #f0f0f0; font-weight: 600; width: 40%; }
+    ul { list-style: none; padding: 0; }
+    li { background: #fafafa; border-radius: 4px; border-left: 3px solid #ddd; padding: 10px 14px; margin-bottom: 8px; }
+    li a { color: #1565C0; text-decoration: none; font-weight: 600; }
+    li a:hover { text-decoration: underline; }
+    .source { font-size: 0.85em; color: #777; margin-top: 3px; }
+    .lang-badge { display: inline-block; font-size: 0.75em; padding: 1px 6px; border-radius: 3px; font-weight: 600; margin-left: 6px; vertical-align: middle; }
+    .lang-en { background: #e8f4fd; color: #1565C0; }
+    .lang-ru { background: #e8e8e8; color: #555; }
+    .weather-source { font-size: 0.85em; color: #777; margin-top: 8px; }
+    .footer { background: #f0f0f0; padding: 15px 30px; text-align: center; font-size: 0.82em; color: #888; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Daily Morning Briefing</h1>
+      <div class="subtitle">{{ day_of_week }}, {{ date_long }} — Austin, TX ({{ tz_abbr }})</div>
+    </div>
+
+    <!-- Weather -->
+    <div class="section">
+      <h2>🌤️ Weather — Austin, TX (ZIP 78759)</h2>
+      {% if weather.available %}
+      <table>
+        <tr><th>Current Temp</th><td>{{ weather.temp_c }}°C ({{ weather.temp_f }}°F)</td></tr>
+        <tr><th>Conditions</th><td>{{ weather.conditions }}</td></tr>
+        {% if weather.tonight_low_c is not none %}
+        <tr><th>Tonight Low</th><td>{{ weather.tonight_low_c }}°C ({{ weather.tonight_low_f }}°F) · {{ weather.tonight_conditions }}</td></tr>
+        {% endif %}
+        {% if weather.tomorrow_high_c is not none %}
+        <tr><th>Tomorrow High</th><td>{{ weather.tomorrow_high_c }}°C ({{ weather.tomorrow_high_f }}°F) · {{ weather.tomorrow_conditions }}</td></tr>
+        {% endif %}
+        <tr><th>Precipitation</th><td>{{ weather.precip }}</td></tr>
+        {% if weather.humidity is not none %}
+        <tr><th>Humidity</th><td>{{ weather.humidity }}%</td></tr>
+        {% endif %}
+        <tr><th>Wind</th><td>{{ weather.wind }}</td></tr>
+      </table>
+      <div class="weather-source">National Weather Service — {{ weather.source_date }}</div>
+      {% else %}
+      <p>Weather data temporarily unavailable.</p>
+      {% endif %}
+    </div>
+
+    <!-- Positive Russia News -->
+    <div class="section">
+      <h2>✅ Positive Russia News</h2>
+      {% if news.positive_russia %}
+      <ul>
+        {% for item in news.positive_russia %}
+        <li>
+          <a href="{{ item.url }}" target="_blank" rel="noopener">{{ item.title }}</a>
+          {% if item.source %}<div class="source">{{ item.source }}{% if item.published %} — {{ item.published }}{% endif %}</div>{% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p>No positive Russia news found in the last 24 hours.</p>
+      {% endif %}
+    </div>
+
+    <!-- Neutral Russia News -->
+    <div class="section">
+      <h2>📰 Neutral Russia News</h2>
+      {% if news.neutral_russia %}
+      <ul>
+        {% for item in news.neutral_russia %}
+        <li>
+          <a href="{{ item.url }}" target="_blank" rel="noopener">{{ item.title }}</a>
+          {% if item.source %}<div class="source">{{ item.source }}{% if item.published %} — {{ item.published }}{% endif %}</div>{% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p>No neutral Russia news found in the last 24 hours.</p>
+      {% endif %}
+    </div>
+
+    <!-- St. Petersburg News -->
+    <div class="section">
+      <h2>🏛️ St. Petersburg News</h2>
+      {% if news.spb %}
+      <ul>
+        {% for item in news.spb %}
+        <li>
+          <a href="{{ item.url }}" target="_blank" rel="noopener">{{ item.title }}</a>
+          {% if item.lang %}
+          <span class="lang-badge lang-{{ item.lang|lower }}">{{ item.lang }}</span>
+          {% endif %}
+          {% if item.source %}<div class="source">{{ item.source }}{% if item.published %} — {{ item.published }}{% endif %}</div>{% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p>No St. Petersburg news found in the last 24 hours.</p>
+      {% endif %}
+    </div>
+
+    <!-- Semiconductor & Investor News -->
+    <div class="section">
+      <h2>💹 Semiconductor &amp; Investor News</h2>
+
+      <h3>🔬 KLAC (KLA Corporation)</h3>
+      {% if news.klac %}
+      <ul>
+        {% for item in news.klac %}
+        <li>
+          <a href="{{ item.url }}" target="_blank" rel="noopener">{{ item.title }}</a>
+          {% if item.source %}<div class="source">{{ item.source }}{% if item.published %} — {{ item.published }}{% endif %}</div>{% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p>No KLAC news found in the last 24 hours.</p>
+      {% endif %}
+
+      <h3>💡 CPO (Co-Packaged Optics)</h3>
+      {% if news.cpo %}
+      <ul>
+        {% for item in news.cpo %}
+        <li>
+          <a href="{{ item.url }}" target="_blank" rel="noopener">{{ item.title }}</a>
+          {% if item.source %}<div class="source">{{ item.source }}{% if item.published %} — {{ item.published }}{% endif %}</div>{% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p>No CPO news found in the last 24 hours.</p>
+      {% endif %}
+    </div>
+
+    <div class="footer">
+      The Moscow Times excluded. Deduplicated against 30-day history.<br>
+      Generated {{ date_long }} · Austin, TX · Automated briefing service
+    </div>
+  </div>
+</body>
+</html>

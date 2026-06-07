@@ -1,0 +1,51 @@
+name: Daily Update
+
+on:
+  schedule:
+    - cron: '0 11 * * *'  # 11:00 UTC = 6:00 AM CDT
+  workflow_dispatch: {}    # Allow manual trigger
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout daily-briefing
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Generate daily briefing and crash dashboard
+        run: python scripts/main.py
+
+      - name: Clone pages repo
+        env:
+          PAGES_TOKEN: ${{ secrets.PAGES_REPO_TOKEN }}
+        run: |
+          git clone https://x-access-token:${PAGES_TOKEN}@github.com/bourov/bourov.github.io.git /tmp/pages
+
+      - name: Copy output files to pages repo
+        run: |
+          cp output/daily/index.html /tmp/pages/daily/index.html
+          cp output/crash/crash_indicators_data.json /tmp/pages/crash/crash_indicators_data.json
+
+      - name: Commit and push to pages repo
+        run: |
+          cd /tmp/pages
+          git config user.name "daily-briefing-bot"
+          git config user.email "bot@bourov.github.io"
+          git add daily/index.html crash/crash_indicators_data.json
+          AUSTIN_DATE=$(TZ=America/Chicago date +'%b %-d, %Y')
+          git diff --cached --quiet && echo "No changes to commit" && exit 0
+          git commit -m "chore: daily update — ${AUSTIN_DATE}"
+          git push

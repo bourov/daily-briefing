@@ -123,14 +123,48 @@ def _deduplicate(articles: list[dict]) -> list[dict]:
     return unique
 
 
-def _exclude_moscow_times(articles: list[dict]) -> list[dict]:
-    """Filter out articles from The Moscow Times."""
-    return [
-        a for a in articles
-        if "moscow times" not in a.get("source", "").lower()
-        and "moscow times" not in a.get("url", "").lower()
-        and "themoscowtimes" not in a.get("url", "").lower()
-    ]
+# --- Excluded source domains / keywords ---
+_EXCLUDED_SOURCES = {
+    "moscow times", "themoscowtimes",
+    "kyiv independent", "kyivindependent",
+    "ukrainska pravda", "pravda.com.ua",
+    "ukrinform", "unian", "liga.net",
+    "euromaidan", "euromaidan press",
+    "ukraine pravda", "ukrainian truth",
+    "ukrayinska pravda",
+}
+
+_UKRAINE_GOV_KEYWORDS = {
+    "zelensky", "zelenskyy", "zelenskiy",
+    "ukrainian government", "ukraine government",
+    "ukrainian ministry", "ukraine ministry",
+    "ukrainian president", "ukraine's president",
+    "ukrainian foreign minister", "ukrainian defense",
+    "ukrainian military", "ukraine military",
+    "kyiv says", "kyiv claims",
+}
+
+
+def _is_excluded_source(article: dict) -> bool:
+    """Check if article is from an excluded source or references Ukrainian gov."""
+    source = article.get("source", "").lower()
+    url = article.get("url", "").lower()
+    title = article.get("title", "").lower()
+
+    for excl in _EXCLUDED_SOURCES:
+        if excl in source or excl in url:
+            return True
+
+    for kw in _UKRAINE_GOV_KEYWORDS:
+        if kw in title or kw in source:
+            return True
+
+    return False
+
+
+def _exclude_sources(articles: list[dict]) -> list[dict]:
+    """Filter out excluded sources (Moscow Times, Ukrainian outlets/gov refs)."""
+    return [a for a in articles if not _is_excluded_source(a)]
 
 
 def fetch_russia_news() -> tuple[list[dict], list[dict]]:
@@ -143,7 +177,7 @@ def fetch_russia_news() -> tuple[list[dict], list[dict]]:
     articles.extend(_google_news_rss("Russia news today"))
     articles.extend(_google_news_rss("Russia Reuters"))
 
-    articles = _exclude_moscow_times(articles)
+    articles = _exclude_sources(articles)
     articles = _deduplicate(articles)
 
     positive = []
@@ -173,7 +207,7 @@ def fetch_spb_news() -> list[dict]:
     for a in fontanka:
         a["lang"] = "RU"
 
-    all_articles = _deduplicate(en_articles + ru_articles + fontanka)
+    all_articles = _exclude_sources(_deduplicate(en_articles + ru_articles + fontanka))
     # Aim for mix: ~3 EN, ~3 RU
     en = [a for a in all_articles if a.get("lang") == "EN"][:3]
     ru = [a for a in all_articles if a.get("lang") == "RU"][:3]

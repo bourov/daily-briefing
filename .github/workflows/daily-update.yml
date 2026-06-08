@@ -36,16 +36,17 @@ jobs:
 
       - name: Copy output files to pages repo
         run: |
-          cp output/daily/index.html /tmp/pages/daily/index.html
-          cp output/crash/crash_indicators_data.json /tmp/pages/crash/crash_indicators_data.json
+          mkdir -p /tmp/pages/daily-py /tmp/pages/crash-py
+          cp output/daily/index.html /tmp/pages/daily-py/index.html
+          cp output/crash/crash_indicators_data.json /tmp/pages/crash-py/crash_indicators_data.json
 
       - name: Commit and push to pages repo
         run: |
           cd /tmp/pages
           git config user.name "daily-briefing-bot"
           git config user.email "bot@bourov.github.io"
-          git add daily/index.html crash/crash_indicators_data.json
+          git add daily-py/index.html crash-py/crash_indicators_data.json
           AUSTIN_DATE=$(TZ=America/Chicago date +'%b %-d, %Y')
           git diff --cached --quiet && echo "No changes to commit" && exit 0
-          git commit -m "chore: daily update — ${AUSTIN_DATE}"
+          git commit -m "chore: daily update (py) — ${AUSTIN_DATE}"
           git push

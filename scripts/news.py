@@ -132,17 +132,16 @@ _EXCLUDED_SOURCES = {
     "euromaidan", "euromaidan press",
     "ukraine pravda", "ukrainian truth",
     "ukrayinska pravda",
+    "nv.ua", "novoe vremya",
+    "hromadske", "babel.ua",
+    "rbc.ua", "rbc-ukraine",
+    "interfax.com.ua", "interfax-ukraine",
+    "censor.net", "defence-ua",
 }
 
-_UKRAINE_GOV_KEYWORDS = {
-    "zelensky", "zelenskyy", "zelenskiy",
-    "ukrainian government", "ukraine government",
-    "ukrainian ministry", "ukraine ministry",
-    "ukrainian president", "ukraine's president",
-    "ukrainian foreign minister", "ukrainian defense",
-    "ukrainian military", "ukraine military",
-    "kyiv says", "kyiv claims",
-}
+# Broad title-level filter: any mention of Ukraine in title
+# (these feeds are about Russia/SPB/semiconductors — Ukraine refs are conflict noise)
+_UKRAINE_TITLE_WORDS = {"ukraine", "ukrainian", "украин", "київ", "kyiv"}
 
 
 def _is_excluded_source(article: dict) -> bool:
@@ -155,7 +154,7 @@ def _is_excluded_source(article: dict) -> bool:
         if excl in source or excl in url:
             return True
 
-    for kw in _UKRAINE_GOV_KEYWORDS:
+    for kw in _UKRAINE_TITLE_WORDS:
         if kw in title or kw in source:
             return True
 

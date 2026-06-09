@@ -59,6 +59,19 @@ def build_crash_json(market_data: dict, indicators: dict) -> dict:
     pcr = indicators.get("put_call", {}).get("current_value") or 0.6
     margin = static["margin_debt"]
     pc = static["private_credit"]
+
+    # Dalio-style Bubble Indicator
+    bubble = crash_probability.compute_bubble_indicator(
+        cape=cape_val,
+        buffett=buffett_val,
+        sp_price=sp_price,
+        bond_yield_pct=t10y,
+        fg_value=fg_val,
+        rsi=rsi,
+        margin_debt_yoy_pct=margin["growth_yoy_pct"],
+        margin_debt_to_gdp_pct=margin["margin_debt_to_gdp_pct"],
+        margin_debt_to_gdp_median=margin["margin_debt_to_gdp_50y_median"],
+    )
     cape_static = static["cape"]
     yield_static = static["yield_curve"]
 
@@ -136,6 +149,7 @@ def build_crash_json(market_data: dict, indicators: dict) -> dict:
                 },
             },
         },
+        "dalio_bubble_indicator": _build_bubble_indicator(bubble, today_str),
         "valuation_indicators": {
             "shiller_cape": {
                 "name": "Shiller CAPE Ratio (Cyclically Adjusted P/E)",
@@ -202,6 +216,24 @@ def build_crash_json(market_data: dict, indicators: dict) -> dict:
     }
 
     return result
+
+
+def _build_bubble_indicator(bubble: dict, today: str) -> dict:
+    composite = bubble["composite_score"]
+    risk = "High" if composite >= 70 else "Elevated" if composite >= 50 else "Moderate" if composite >= 30 else "Low"
+    return {
+        "name": "Dalio-Style Bubble Indicator",
+        "composite_score": composite,
+        "composite_reading": bubble["composite_reading"],
+        "risk_level": risk,
+        "unit": "0-100",
+        "interpretation": f"Composite bubble score at {composite}/100 ({bubble['composite_reading']}). Ray Dalio's framework scores 6 dimensions: prices vs traditional measures, unsustainable conditions, new buyer entry, bullish sentiment, leverage, and forward purchases. Current level {'approaches 1929/2000 extremes' if composite >= 75 else 'is in bubble territory' if composite >= 60 else 'shows frothy conditions' if composite >= 40 else 'is within normal range'}.",
+        "as_of_date": today,
+        "gauges": bubble["gauges"],
+        "historical_comparisons": bubble["historical_comparisons"],
+        "methodology": bubble["methodology"],
+        "source_note": "Rules-based proxy — not Bridgewater's proprietary indicator. Inspired by Dalio's publicly described 6-gauge framework.",
+    }
 
 
 def _build_technicals(sp: dict, today: str) -> dict:

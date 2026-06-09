@@ -41,6 +41,9 @@ jobs:
           # Copy crash dashboard frontend from the LLM version, then overwrite JSON with Python-generated data
           cp -r /tmp/pages/crash/* /tmp/pages/crash-py/ 2>/dev/null || true
           cp output/crash/crash_indicators_data.json /tmp/pages/crash-py/crash_indicators_data.json
+          # Inject Dalio Bubble Indicator overlay into crash-py
+          cp scripts/static/bubble_overlay.js /tmp/pages/crash-py/bubble_overlay.js
+          sed -i 's|</body>|<script src="bubble_overlay.js"></script></body>|' /tmp/pages/crash-py/index.html
 
       - name: Commit and push to pages repo
         run: |

@@ -46,7 +46,7 @@ def fetch_weather() -> dict | None:
             "forecast_periods": periods[:6],
             "current_observation": {
                 "temperature_c": observation.get("temperature", {}).get("value"),
-                "humidity": observation.get("relativeHumidity", {}).get("value"),
+                "dewpoint_c": observation.get("dewpoint", {}).get("value"),
                 "wind_speed_kmh": observation.get("windSpeed", {}).get("value"),
                 "wind_direction": observation.get("windDirection", {}).get("value"),
                 "description": observation.get("textDescription"),
@@ -72,9 +72,12 @@ def format_weather(weather_data: dict | None, austin_date: str) -> dict:
     else:
         temp_f = None
 
-    humidity = obs.get("humidity")
-    if humidity is not None:
-        humidity = round(humidity)
+    dewpoint_c = obs.get("dewpoint_c")
+    if dewpoint_c is not None:
+        dewpoint_f = round(dewpoint_c * 9 / 5 + 32)
+        dewpoint_c = round(dewpoint_c)
+    else:
+        dewpoint_f = None
 
     wind_kmh = obs.get("wind_speed_kmh")
     wind_dir = obs.get("wind_direction")
@@ -127,7 +130,8 @@ def format_weather(weather_data: dict | None, austin_date: str) -> dict:
         "available": True,
         "temp_c": temp_c,
         "temp_f": temp_f,
-        "humidity": humidity,
+        "dewpoint_c": dewpoint_c,
+        "dewpoint_f": dewpoint_f,
         "wind": wind_str,
         "conditions": conditions,
         "tonight_low_f": tonight_f,

@@ -52,8 +52,8 @@
         <tr><th>Tomorrow High</th><td>{{ weather.tomorrow_high_c }}°C ({{ weather.tomorrow_high_f }}°F) · {{ weather.tomorrow_conditions }}</td></tr>
         {% endif %}
         <tr><th>Precipitation</th><td>{{ weather.precip }}</td></tr>
-        {% if weather.humidity is not none %}
-        <tr><th>Humidity</th><td>{{ weather.humidity }}%</td></tr>
+        {% if weather.dewpoint_c is not none %}
+        <tr><th>Dew Point</th><td>{{ weather.dewpoint_c }}°C ({{ weather.dewpoint_f }}°F)</td></tr>
         {% endif %}
         <tr><th>Wind</th><td>{{ weather.wind }}</td></tr>
       </table>
@@ -151,7 +151,7 @@
     </div>
 
     <div class="footer">
-      The Moscow Times excluded. Deduplicated against 30-day history.<br>
+      The Moscow Times and Ukrainian sources excluded. Deduplicated against 30-day history.<br>
       Generated {{ date_long }} · Austin, TX · Automated briefing service
     </div>
   </div>
